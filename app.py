@@ -10,9 +10,6 @@ from keras.models import load_model
 from firebase_admin import credentials, db
 from flask import Flask, render_template, request, redirect, url_for
 
-# Bersihkan Git Add dari Git di Repo ini
-
-
 # Working Directory I
 cwd = os.getcwd()
 project_dir = f"{cwd}\Programs"
