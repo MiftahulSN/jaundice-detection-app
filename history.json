@@ -1,0 +1,38 @@
+[
+  {
+    "filename": "Trial 1.jpg",
+    "grade": "Grade 5 - Jaundice",
+    "grade_class": "high",
+    "rekomendasi": "Grade 5: Kondisi sangat kritis, penanganan darurat diperlukan!",
+    "results": {
+      "lengan": {
+        "label": "Jaundice",
+        "image": "lengan_Trial 1.jpg"
+      },
+      "perut": {
+        "label": "Jaundice",
+        "image": "perut_Trial 1.jpg"
+      },
+      "telapak": {
+        "label": "Jaundice",
+        "image": "telapak_Trial 1.jpg"
+      }
+    },
+    "message": "Bagian wajah tidak terdeteksi, melanjutkan ke bawah...<br>Bagian paha tidak terdeteksi, melanjutkan ke bawah...",
+    "timestamp": "16 April 2025 - 23:03"
+  },
+  {
+    "filename": "Trial 2.jpg",
+    "grade": "Grade 0 - Normal",
+    "grade_class": "low",
+    "rekomendasi": "Bayi dalam kondisi normal.",
+    "results": {
+      "lengan": {
+        "label": "Normal",
+        "image": "lengan_Trial 2.jpg"
+      }
+    },
+    "message": "Bagian wajah tidak terdeteksi, melanjutkan ke bawah...<br>Bagian perut tidak terdeteksi, melanjutkan ke bawah...<br>Bagian paha tidak terdeteksi, melanjutkan ke bawah...<br>Bagian telapak tidak terdeteksi, melanjutkan ke bawah...",
+    "timestamp": "16 April 2025 - 23:05"
+  }
+]

@@ -1,0 +1,7 @@
+firebase-admin
+Flask
+opencv-python
+numpy
+feedparser
+ultralytics
+tensorflow

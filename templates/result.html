@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+{% block title %}Hasil Deteksi{% endblock %}
+{% block content %}
+    <h1>📊 Hasil Deteksi Jaundice</h1>
+    <p><strong>Grade:</strong> {{ grade_text }}</p>
+    <p><strong>Rekomendasi:</strong><br>{{ rekomendasi }}</p>
+    <hr>
+    <h2>Deteksi per Bagian Tubuh:</h2>
+    <div style="display: flex; flex-wrap: wrap; gap: 20px;">
+        {% for part, info in results.items() %}
+            <div style="text-align:center;">
+                <img src="{{ url_for('static', filename='crops/' + info.image) }}" width="160" style="border-radius:8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);"><br>
+                <strong>{{ part|capitalize }}</strong><br>
+                {{ info.label }}
+            </div>
+        {% endfor %}
+    </div>
+    <hr>
+    <h3>Catatan:</h3>
+    <p>{{ message|safe }}</p>
+{% endblock %}

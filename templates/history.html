@@ -1,0 +1,222 @@
+{% extends "layout.html" %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Riwayat Deteksi Jaundice</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f5f8fc;
+    }
+
+    .accordion-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.5s ease;
+    }
+
+    .accordion-content.show {
+      max-height: 1000px;
+    }
+
+    .sticky-bar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background-color: #f1f5f9; /* Tailwind gray-100 */
+      border-bottom: 1px solid #e2e8f0; /* Tailwind gray-200 */
+    }
+
+    header {
+      background-color: #0073e6;
+      padding: 20px 40px;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .logo-area {
+      display: flex;
+      align-items: center;
+    }
+
+    .logo-area img {
+      height: 50px;
+      margin-right: 15px;
+      border-radius: 8px;
+      object-fit: cover;
+    }
+
+    .logo-area span {
+      font-size: 22px;
+      font-weight: 600;
+      color: white;
+    }
+
+    nav a {
+      color: white;
+      margin-left: 25px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.3s;
+    }
+
+    nav a:hover {
+      color: #cde7ff;
+    }
+
+    @media (max-width: 768px) {
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      nav {
+        margin-top: 10px;
+      }
+
+      nav a {
+        display: inline-block;
+        margin: 5px 10px 0 0;
+      }
+    }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+  <!-- ✅ Konten Riwayat Deteksi -->
+  <div class="max-w-4xl mx-auto p-4">
+    <!-- Sticky Bar -->
+    <div class="sticky-bar px-4 py-3 mb-4 rounded-xl">
+      <h1 class="text-2xl font-bold text-blue-700 mb-2 flex items-center gap-2">
+        📋 Riwayat Deteksi Jaundice
+      </h1>
+      <div class="flex flex-wrap gap-2 items-center text-sm">
+        <form method="GET" action="/history" class="flex items-center gap-2">
+          <input type="text" name="username" id="username" placeholder="Input your name" class="px-3 py-1 rounded border border-gray-300 rounded-hover shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          <button type="submit" class="bg-green-600 text-white px-3 py-1 rounded-hover font-semibold shadow hover:bg-green-700 transition">🔍Find History</button>
+        </form>
+        <button id="expandAllBtn" class="bg-blue-600 text-white px-3 py-1 rounded-hover font-semibold shadow hover:bg-blue-700 transition">Expand All</button>
+        <button id="collapseAllBtn" class="bg-blue-600 text-white px-3 py-1 rounded-hover font-semibold shadow hover:bg-blue-700 transition">Collapse All</button>
+        <button id="exportExcelBtn" class="bg-red-600 text-white px-3 py-1 rounded-hover font-semibold shadow hover:bg-red-700 transition">Export to Excel</button>
+      </div>
+    </div>
+
+    <!-- Accordion Items -->
+    {% for item in history %}
+    <div class="accordion-item border rounded-xl shadow-md mb-4 bg-white overflow-hidden history-entry">
+      <button class="accordion-toggle w-full text-left px-6 py-4 flex justify-between items-center bg-blue-600 text-white font-semibold rounded-t-xl">
+        {{ item.timestamp }}
+      </button>
+      <div class="accordion-content px-6 text-gray-800 bg-white">
+        <div class="py-4 space-y-3">
+          <div class="history-rekomendasi">
+            <strong>Rekomendasi:</strong><br>
+            {{ item.rekomendasi }}
+          </div>
+          {% if item.message %}
+          <div class="history-message">
+            <strong>Catatan Sistem:</strong><br>
+            {{ item.message }}
+          </div>
+          {% endif %}
+          {% if item.results %}
+          <div class="history-results">
+            <strong>Deteksi Bagian Tubuh:</strong>
+            <ul class="list-disc list-inside mt-1">
+              {% for part, result in item.results.items() %}
+              <li>{{ part }} {{ result.label }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- ✅ Script Accordion & Export -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const toggles = document.querySelectorAll('.accordion-toggle');
+      const contents = document.querySelectorAll('.accordion-content');
+      const expandAllBtn = document.getElementById('expandAllBtn');
+      const collapseAllBtn = document.getElementById('collapseAllBtn');
+      const exportExcelBtn = document.getElementById('exportExcelBtn');
+      const searchBtn = document.getElementById('searchBtn');
+      const searchInput = document.getElementById('username');
+
+      searchBtn?.addEventListener('click', () => {
+        const keyword = searchInput.value.trim().toLowerCase();
+        const entries = document.querySelectorAll('.history-entry');
+
+        entries.forEach(entry => {
+          const contentText = entry.innerText.toLowerCase();
+          if (keyword === "" || contentText.includes(keyword)) {
+            entry.style.display = "";
+          } else {
+            entry.style.display = "none";
+          }
+        });
+      });
+
+      toggles.forEach((toggle, index) => {
+        toggle.addEventListener('click', () => {
+          contents[index].classList.toggle('show');
+        });
+      });
+
+      expandAllBtn?.addEventListener('click', () => {
+        contents.forEach(content => content.classList.add('show'));
+      });
+
+      collapseAllBtn?.addEventListener('click', () => {
+        contents.forEach(content => content.classList.remove('show'));
+      });
+
+      exportExcelBtn?.addEventListener('click', () => {
+        const rows = [];
+        const entries = document.querySelectorAll('.history-entry');
+        entries.forEach(entry => {
+          const timestamp = entry.querySelector('.accordion-toggle').innerText.trim();
+          const rekomendasiEl = entry.querySelector('.history-rekomendasi');
+          const catatanEl = entry.querySelector('.history-message');
+          const hasilEl = entry.querySelector('.history-results');
+
+          const rekomendasi = rekomendasiEl ? rekomendasiEl.innerText.replace('Rekomendasi:', '').trim() : '';
+          const catatan = catatanEl ? catatanEl.innerText.replace('Catatan Sistem:', '').trim() : '';
+          const hasilList = hasilEl ? Array.from(hasilEl.querySelectorAll('li')).map(li => li.innerText.trim()).join(', ') : '';
+
+          rows.push({
+            Timestamp: timestamp,
+            Rekomendasi: rekomendasi,
+            Catatan: catatan,
+            'Deteksi Bagian Tubuh': hasilList
+          });
+        });
+
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.json_to_sheet(rows);
+        XLSX.utils.book_append_sheet(wb, ws, "Riwayat_Jaundice");
+        XLSX.writeFile(wb, "Riwayat_Deteksi_Jaundice.xlsx");
+      });
+    });
+  </script>
+</body>
+</html>
+
+{% endblock %}
